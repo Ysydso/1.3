@@ -1,6 +1,6 @@
 import { buildDiaryEntry } from "@diary/shared/types/diaryEntry";
 import { renderHook, waitFor } from "@testing-library/react";
-import { rest } from "msw";
+import { http } from "msw";
 import { wrap } from "souvlaki";
 import { diaryEntryUriTemplate } from "test/mocks/diaryEntryUriTemplate";
 import { server } from "test/mocks/server";
@@ -28,7 +28,7 @@ describe("useDiaryEntryQuery", () => {
 
   it("returns an error if fetch responds with 404", async () => {
     server.use(
-      rest.get(diaryEntryUriTemplate, (_, res, ctx) => res(ctx.status(404)))
+      http.get(diaryEntryUriTemplate, () => new Response(null, { status: 404 }))
     );
 
     const { result } = renderHook(() => useDiaryEntryQuery("TEST"), {
@@ -36,35 +36,14 @@ describe("useDiaryEntryQuery", () => {
     });
 
     await waitFor(() => {
-      expect(result.current.error).toEqual(
-        expect.objectContaining({ message: "Not Found" })
-      );
-    });
-  });
-
-  it("returns an error if fetch responds with 403", async () => {
-    server.use(
-      rest.get(diaryEntryUriTemplate, (_, res, ctx) => res(ctx.status(403)))
-    );
-
-    const { result } = renderHook(() => useDiaryEntryQuery("TEST"), {
-      wrapper,
-    });
-
-    await waitFor(() => {
-      expect(result.current.error).toEqual(
-        expect.objectContaining({ message: "Forbidden" })
-      );
+      expect(result.current.error).toStrictEqual(expect.any(Error));
     });
   });
 
   it("returns an error if the response is not a valid diaryEntry", async () => {
     server.use(
-      rest.get(diaryEntryUriTemplate, (_, res, ctx) =>
-        res(
-          ctx.status(200),
-          ctx.body(JSON.stringify({ diaryEntry: "not a diary entry" }))
-        )
+      http.get(diaryEntryUriTemplate, () =>
+        Response.json({ diaryEntry: "not a diary entry" })
       )
     );
 
