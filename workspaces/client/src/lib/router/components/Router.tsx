@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { RouterContext, type PathSetter } from "../contexts/RouterContext";
 
 export type RouterProps = React.PropsWithChildren<{
@@ -15,9 +15,13 @@ export const Router: React.FC<RouterProps> = ({
 }) => {
   const [path, setPath] = useState(initialPath);
   const [isPathMatched, setIsPathMatched] = useState(false);
-  const contextValue = updatePath
-    ? { path: initialPath, setPath: updatePath, setIsPathMatched }
-    : { path, setPath, setIsPathMatched };
+
+  const contextValue = useMemo(() => {
+    return updatePath
+      ? { path: initialPath, setPath: updatePath, setIsPathMatched }
+      : { path, setPath, setIsPathMatched };
+  }, [path, initialPath, updatePath, setIsPathMatched]);
+
   return (
     <RouterContext.Provider value={contextValue}>
       {children}

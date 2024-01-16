@@ -4,7 +4,7 @@ containers:
     dependencies:
       - diary-db
     environment:
-      DATABASE_URL: postgresql://dev:dev@diary-db:5432/dev
+      DATABASE_URL: postgresql://${{ secrets.DB_USERNAME }}:${{ secrets.DB_PASSWORD }}@diary-db:5432/dev
 
   diary-server-gateway:
     image: flaccid/tls-proxy
@@ -25,7 +25,7 @@ containers:
     dependencies:
       - diary-db
     environment:
-      DATABASE_URL: postgresql://dev:dev@diary-db:5432/dev
+      DATABASE_URL: postgresql://${{ secrets.DB_USERNAME }}:${{ secrets.DB_PASSWORD }}@diary-db:5432/dev
     health_check:
       command: curl localhost:4000
       retries: 20
@@ -49,14 +49,14 @@ containers:
   diary-db:
     image: postgres:16.1
     health_check:
-      command: pg_isready -d postgresql://dev:dev@diary-db:5432/dev
+      command: pg_isready -d postgresql://${{ secrets.DB_USERNAME }}:${{ secrets.DB_PASSWORD }}@diary-db:5432/dev
       interval: 5s
       retries: 6
     volumes:
       - ./workspaces/server/initdb.d:/docker-entrypoint-initdb.d
     environment:
-      POSTGRES_PASSWORD: dev
-      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      POSTGRES_USER: ${{ secrets.DB_USERNAME }}
       POSTGRES_DB: dev
 
 tasks:
@@ -70,19 +70,19 @@ tasks:
   server-test:
     prerequisites:
       - setup
-    dependencies:
+      dependencies:
       - diary-db
     customise:
       diary-db:
         environment:
-          POSTGRES_PASSWORD: test
-          POSTGRES_USER: test
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          POSTGRES_USER: ${{ secrets.DB_USERNAME }}
           POSTGRES_DB: test
     run:
       container: diary-build-env
       command: pnpm --filter server test
       environment:
-        DATABASE_URL: postgresql://test:test@diary-db:5432/test
+        DATABASE_URL: postgresql://${{ secrets.DB_USERNAME }}:${{ secrets.DB_PASSWORD }}@diary-db:5432/test
 
   server-coverage:
     prerequisites:
@@ -92,14 +92,14 @@ tasks:
     customise:
       diary-db:
         environment:
-          POSTGRES_PASSWORD: test
-          POSTGRES_USER: test
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          POSTGRES_USER: ${{ secrets.DB_USERNAME }}
           POSTGRES_DB: test
     run:
       container: diary-build-env
       command: pnpm --filter server coverage
       environment:
-        DATABASE_URL: postgresql://test:test@diary-db:5432/test
+        DATABASE_URL: postgresql://${{ secrets.DB_USERNAME }}:${{ secrets.DB_PASSWORD }}@diary-db:5432/test
 
   server-build:
     prerequisites:

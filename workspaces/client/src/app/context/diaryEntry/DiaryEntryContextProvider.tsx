@@ -48,13 +48,18 @@ export const DiaryEntryContextProvider: React.FC<
     [diaryEntry, updateDiaryEntryMutation, saveTimeoutInterval, saveTimeout]
   );
 
+  const contextValue = useMemo(() => ({
+    diaryEntry,
+    updateDiaryEntry,
+    isDirty,
+    isLoading,
+  }), [diaryEntry, updateDiaryEntry, isDirty, isLoading]);
+
   return (
-    <DiaryEntryContext.Provider
-      value={{
-        diaryEntry,
-        updateDiaryEntry,
-        isDirty,
-        isLoading,
+    <DiaryEntryContext.Provider value={contextValue}>
+      {children}
+    </DiaryEntryContext.Provider>
+  );
       }}
     >
       {children}

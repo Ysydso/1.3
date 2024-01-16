@@ -10,8 +10,16 @@ export const UserNav = () => {
           <small>{user?.nickname}</small>
         </li>
         <li>
+          <button
+            type="button"
+            className="outline secondary"
+            onClick={() => logout()}
+          >
+            Log out
+          </button>
           <span
             role="button"
+            tabIndex={0}
             className="outline secondary"
             onClick={() => logout()}
           >

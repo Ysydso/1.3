@@ -92,7 +92,7 @@ describe("Router", () => {
     render(
       <Router initialPath="/something" fallback={Fallback}>
         <Route path="/something">
-          <>Hello</>
+            Hello
         </Route>
       </Router>
     );

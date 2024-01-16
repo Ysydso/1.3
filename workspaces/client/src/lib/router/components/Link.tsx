@@ -21,7 +21,7 @@ export const Link: React.FC<LinkProps> = ({
       href={to}
       onClick={(event) => {
         event.preventDefault();
-        setPath && setPath(to);
+        setPath?.(to);
       }}
       {...anchorAttrs}
     >

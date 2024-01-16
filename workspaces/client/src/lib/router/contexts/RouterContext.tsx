@@ -14,8 +14,8 @@ export const RouterContext = createContext<RouterContextValue>({ path: "" });
 export const useSetPath = () => {
   const { setPath, setIsPathMatched } = useContext(RouterContext);
   return (path: string) => {
-    setIsPathMatched && setIsPathMatched(false);
-    setPath && setPath(path);
+    setIsPathMatched?.(false);
+    setPath?.(path);
   };
 };
 
